@@ -31,12 +31,7 @@ length(cum)
 
 
 ar_order<-2
-infected_first_category_success<-infected_first_category[-c(1:ar_order)] #this will be used in dbinom er x.. binomial e I2 theke I598 obdhi lagbe . So first one deleted
-length(infected_first_category_success)
-
-# t<-1:length(infected_first_category)
-#infected_first_category_minus_last_term<-data$Bath[-nstep]  #prob. (ie pie) ber korar somoi I1,..,,I597 lagbe.. pie1 is functn of I1,.., pie2 is functn of I2 etc.. so last er ta delete kore dewoa holo
-
+infected_first_category_success<-infected_first_category[-c(1:ar_order)] 
 log_infected_first_category<-infected_first_category
 log_infected_first_category[log_infected_first_category == 0] <- 1
 log_infected_first_category<-log(log_infected_first_category)

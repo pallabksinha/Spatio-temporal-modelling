@@ -32,13 +32,10 @@ cum<-cum[-nstep]   #S_546 is deleted because upto S_545 is required
 length(cum)
 
 
-
 ar_order<-1
-infected_first_category_success<-infected_first_category[-c(1:ar_order)] #this will be used in dbinom er x.. binomial e I2 theke I598 obdhi lagbe . So first one deleted
+infected_first_category_success<-infected_first_category[-c(1:ar_order)] 
 length(infected_first_category_success)
 
-# t<-1:length(infected_first_category)
-#infected_first_category_minus_last_term<-data$Bath[-nstep]  #prob. (ie pie) ber korar somoi I1,..,,I597 lagbe.. pie1 is functn of I1,.., pie2 is functn of I2 etc.. so last er ta delete kore dewoa holo
 
 log_infected_first_category<-infected_first_category
 log_infected_first_category[log_infected_first_category == 0] <- 1
@@ -86,7 +83,7 @@ data_sf<-matrix(c(infected_first_category_success,infected_first_category_failur
 
 
 birth_data<-read_excel("C:/Users/ASUS/Desktop/Current Modelling/data from niket and grenfell/data sent by niket/60 cities.xlsx")
-xn<-as.numeric(birth_data[3, 3:((training_upto/26)+2)])
+xn<-as.numeric(birth_data[4, 3:((training_upto/26)+2)])
 divided_vector <- xn / 26
 biweekly_birth_data<- rep(divided_vector, each = 26)
 length(biweekly_birth_data)
@@ -100,8 +97,8 @@ if (ar_order == 1) {
 length(biweekly_birth_data_in_inverselogit)
 t<- (ar_order+1):training_upto
 length(t)
-seasonality1<-cos(2*pi*t/52)
-seasonality2<-cos(2*pi*t/26)
+seasonality1<-sin(2*pi*t/52)
+seasonality2<-sin(2*pi*t/26)
 length(seasonality1)
 
 baby_boom_effect1<- c(rep(0,104),rep(1,182-104),rep(0,nstep-182))
@@ -134,11 +131,11 @@ length(infected_first_category_in_inverselogit$lag1_3rd)
 
 nrow(data_sf)
 
-# data<-matrix(c(rep(1,length(infected_first_category_in_inverselogit$lag1)),
-#                infected_first_category_in_inverselogit$lag1+infected_first_category_in_inverselogit$lag1_2nd+infected_first_category_in_inverselogit$lag1_3rd,
-#                biweekly_birth_data_in_inverselogit,seasonality2,t,baby_boom_effect
-# ),
-# nrow = length(infected_first_category_in_inverselogit$lag1))
+data<-matrix(c(rep(1,length(infected_first_category_in_inverselogit$lag1)),
+               infected_first_category_in_inverselogit$lag1+infected_first_category_in_inverselogit$lag1_2nd+infected_first_category_in_inverselogit$lag1_3rd,
+               biweekly_birth_data_in_inverselogit,seasonality2,t,baby_boom_effect
+),
+nrow = length(infected_first_category_in_inverselogit$lag1))
 
 data<- data.frame(infected_first_category_in_inverselogit$lag1+infected_first_category_in_inverselogit$lag1_2nd+infected_first_category_in_inverselogit$lag1_3rd,
                   biweekly_birth_data_in_inverselogit,seasonality2,t,baby_boom_effect)
@@ -149,7 +146,6 @@ head(data,20)
 
 model <- glm(cbind(S,F) ~ Lag1_and_Lag1_2nd_and_LAg1_3rd+biweeklybirth+Seasonalit2+time+baby_boom, 
              family = binomial(link = "logit"), data = data)
-
 
 
 
@@ -168,6 +164,3 @@ legend("topright",legend = c("Real","Estimated"),col=c("black","red"),lty =c(1,1
 
 Box_ljung_test<- Box.test(model$residuals,lag=500,type = "Ljung-Box")
 Box_ljung_test
-
-
-

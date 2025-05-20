@@ -22,6 +22,8 @@ nstep<-length(infected_first_category)
 N<-1106465
 
 S1<-1106465
+
+
 cum<-cumsum(infected_first_category[-1]) #this is I2, I2+I3, I2+I3+I4, ... ,I2+...+I546
 length(cum)
 cum<-c(S1,S1-cum) #This is S1, S1-I2, S1-(I2+I3), ... ,S1 - (I2+...+I546)
@@ -32,11 +34,9 @@ length(cum)
 
 
 ar_order<-1
-infected_first_category_success<-infected_first_category[-c(1:ar_order)] #this will be used in dbinom er x.. binomial e I2 theke I598 obdhi lagbe . So first one deleted
+infected_first_category_success<-infected_first_category[-c(1:ar_order)] 
 length(infected_first_category_success)
 
-# t<-1:length(infected_first_category)
-#infected_first_category_minus_last_term<-data$Bath[-nstep]  #prob. (ie pie) ber korar somoi I1,..,,I597 lagbe.. pie1 is functn of I1,.., pie2 is functn of I2 etc.. so last er ta delete kore dewoa holo
 
 log_infected_first_category<-infected_first_category
 log_infected_first_category[log_infected_first_category == 0] <- 1
@@ -45,11 +45,9 @@ infected_first_category_in_inverselogit<- data.frame("lag1"=dplyr::lag(log_infec
                                                      "lag2"=dplyr::lag(log_infected_first_category, 2) )
 
 
-
+#distance between [leicester,Birmingham]=52167.24,[Birmingham,coventry]=55266.08 (in meters)
 #distance between [leicester,Birmingham]=52.16724,[Birmingham,coventry]=55.26608 (in kms)
-#so exp(-52.95513) = 1.004337e-23 ; exp(-55.26608) = 9.959704e-25
-#so (1/52.16724)^2= 0.0003674551 ;  (1/55.26608)^2=0.000327403
-
+#so exp(-52.16724) = 2.208287e-23 ; exp(-55.26608) = 9.959704e-25
 
 
 infected_second_category<-data$Leicester[1:training_upto]
@@ -58,12 +56,12 @@ infected_third_category<-data$Coventry[1:training_upto]
 log_infected_second_category<-infected_second_category
 log_infected_second_category[log_infected_second_category == 0] <- 1
 log_infected_second_category<-log(log_infected_second_category)
-log_infected_second_category<-0.0003674551*log_infected_second_category    #this is w[i,j]*infected_2nd_category
+log_infected_second_category<-2.208287e-23*log_infected_second_category    #this is w[i,j]*infected_2nd_category
 
 log_infected_third_category<-infected_third_category
 log_infected_third_category[log_infected_third_category == 0] <- 1
 log_infected_third_category<-log(log_infected_third_category)
-log_infected_third_category<-0.000327403*log_infected_third_category       #this is w[i,j]*infected_3rd_category
+log_infected_third_category<-9.959704e-25*log_infected_third_category       #this is w[i,j]*infected_3rd_category
 
 infected_first_category_in_inverselogit<- data.frame("lag1"=dplyr::lag(log_infected_first_category, 1),
                                                      
@@ -169,5 +167,5 @@ legend("topright",legend = c("Real","Estimated"),col=c("black","red"),lty =c(1,1
 Box_ljung_test<- Box.test(model$residuals,lag=500,type = "Ljung-Box")
 Box_ljung_test
 
-summary(model)
+
 

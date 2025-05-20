@@ -11,7 +11,7 @@ library(Rmpfr)
 setwd("C:/Users/ASUS/Desktop/Current Modelling/data from niket and grenfell/data sent by niket")
 data<-read_excel("C:/Users/ASUS/Desktop/Current Modelling/data from niket and grenfell/data sent by niket/60 measles.xlsx")
 training_upto<-546
-infected_first_category <- data$Leicester[1:training_upto]
+infected_first_category <- data$Coventry[1:training_upto]
 plot(infected_first_category,type = "l",col="red",ylab="Case Count",xlab = "Time(biweekly)")
 acf(infected_first_category,xlab="Lag",main="Acf plot for counts",ci=0.99)
 pacf(infected_first_category,   xlab="Lag",main="PAcf plot for counts",ci=0.99)
@@ -19,10 +19,8 @@ pacf(infected_first_category,   xlab="Lag",main="PAcf plot for counts",ci=0.99)
 length(infected_first_category)
 nstep<-length(infected_first_category)
 
-N<-276550
-
-S1<-276550
-
+N<-265950
+S1<-265950
 
 cum<-cumsum(infected_first_category[-1]) #this is I2, I2+I3, I2+I3+I4, ... ,I2+...+I546
 length(cum)
@@ -34,12 +32,7 @@ length(cum)
 
 
 ar_order<-1
-infected_first_category_success<-infected_first_category[-c(1:ar_order)] #this will be used in dbinom er x.. binomial e I2 theke I598 obdhi lagbe . So first one deleted
-length(infected_first_category_success)
-
-# t<-1:length(infected_first_category)
-#infected_first_category_minus_last_term<-data$Bath[-nstep]  #prob. (ie pie) ber korar somoi I1,..,,I597 lagbe.. pie1 is functn of I1,.., pie2 is functn of I2 etc.. so last er ta delete kore dewoa holo
-
+infected_first_category_success<-infected_first_category[-c(1:ar_order)] 
 log_infected_first_category<-infected_first_category
 log_infected_first_category[log_infected_first_category == 0] <- 1
 log_infected_first_category<-log(log_infected_first_category)
@@ -47,17 +40,18 @@ infected_first_category_in_inverselogit<- data.frame("lag1"=dplyr::lag(log_infec
                                                      "lag2"=dplyr::lag(log_infected_first_category, 2) )
 
 
-#distance between [leicester,coventry]=52.95513,[Leicester,birmingham]=52.16724 (in kms)
-#so exp(-52.95513) = 1.004337e-23 ; exp(-52.16724) = 2.208287e-23
+#distance between [leicester,coventry]=52955.13,[Birmingham,coventry]=55266.08 (in meters)
+#distance between [leicester,coventry]=52.95513,[Birmingham,coventry]=55.26608 (in kms)
+#so exp(-52.95513) = 1.004337e-23 ; exp(-55.26608) = 9.959704e-25
 
 
 infected_second_category<-data$Birmingham[1:training_upto]
-infected_third_category<-data$Coventry[1:training_upto]
+infected_third_category<-data$Leicester[1:training_upto]
 
 log_infected_second_category<-infected_second_category
 log_infected_second_category[log_infected_second_category == 0] <- 1
 log_infected_second_category<-log(log_infected_second_category)
-log_infected_second_category<-2.208287e-23*log_infected_second_category    #this is w[i,j]*infected_2nd_category
+log_infected_second_category<-9.959704e-25*log_infected_second_category    #this is w[i,j]*infected_2nd_category
 
 log_infected_third_category<-infected_third_category
 log_infected_third_category[log_infected_third_category == 0] <- 1
@@ -85,7 +79,7 @@ data_sf<-matrix(c(infected_first_category_success,infected_first_category_failur
 
 
 birth_data<-read_excel("C:/Users/ASUS/Desktop/Current Modelling/data from niket and grenfell/data sent by niket/60 cities.xlsx")
-xn<-as.numeric(birth_data[25, 3:((training_upto/26)+2)])
+xn<-as.numeric(birth_data[15, 3:((training_upto/26)+2)])
 divided_vector <- xn / 26
 biweekly_birth_data<- rep(divided_vector, each = 26)
 length(biweekly_birth_data)
@@ -99,8 +93,8 @@ if (ar_order == 1) {
 length(biweekly_birth_data_in_inverselogit)
 t<- (ar_order+1):training_upto
 length(t)
-seasonality1<-cos(2*pi*t/52)
-seasonality2<-cos(2*pi*t/26)
+seasonality1<-sin(2*pi*t/52)
+seasonality2<-sin(2*pi*t/26)
 length(seasonality1)
 
 baby_boom_effect1<- c(rep(0,104),rep(1,182-104),rep(0,nstep-182))
@@ -114,16 +108,30 @@ length(baby_boom_effect)
 
 
 
+
+
+
+head(infected_first_category_in_inverselogit,n=20)
+length(biweekly_birth_data_in_inverselogit)
+length(infected_first_category_in_inverselogit$lag1)
+length(infected_first_category_in_inverselogit$lag2)
+
+length(biweekly_birth_data_in_inverselogit)
+length(seasonality1)
+length(seasonality2)
+length(t)
+length(baby_boom_effect)
+
 length(infected_first_category_in_inverselogit$lag1_2nd)
 length(infected_first_category_in_inverselogit$lag1_3rd)
 
 nrow(data_sf)
 
-# data<-matrix(c(rep(1,length(infected_first_category_in_inverselogit$lag1)),
-#                infected_first_category_in_inverselogit$lag1+infected_first_category_in_inverselogit$lag1_2nd+infected_first_category_in_inverselogit$lag1_3rd,
-#                biweekly_birth_data_in_inverselogit,seasonality2,t,baby_boom_effect
-# ),
-# nrow = length(infected_first_category_in_inverselogit$lag1))
+data<-matrix(c(rep(1,length(infected_first_category_in_inverselogit$lag1)),
+               infected_first_category_in_inverselogit$lag1+infected_first_category_in_inverselogit$lag1_2nd+infected_first_category_in_inverselogit$lag1_3rd,
+               biweekly_birth_data_in_inverselogit,seasonality2,t,baby_boom_effect
+),
+nrow = length(infected_first_category_in_inverselogit$lag1))
 
 data<- data.frame(infected_first_category_in_inverselogit$lag1+infected_first_category_in_inverselogit$lag1_2nd+infected_first_category_in_inverselogit$lag1_3rd,
                   biweekly_birth_data_in_inverselogit,seasonality2,t,baby_boom_effect)
@@ -134,8 +142,6 @@ head(data,20)
 
 model <- glm(cbind(S,F) ~ Lag1_and_Lag1_2nd_and_LAg1_3rd+biweeklybirth+Seasonalit2+time+baby_boom, 
              family = binomial(link = "logit"), data = data)
-
-
 
 
 acf(model$residuals   ,xlab="Lag",main="Acf plot for errors",ci=0.50)
@@ -153,6 +159,3 @@ legend("topright",legend = c("Real","Estimated"),col=c("black","red"),lty =c(1,1
 
 Box_ljung_test<- Box.test(model$residuals,lag=500,type = "Ljung-Box")
 Box_ljung_test
-
-
-

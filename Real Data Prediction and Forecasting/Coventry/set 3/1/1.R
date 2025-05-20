@@ -32,12 +32,7 @@ length(cum)
 
 
 ar_order<-1
-infected_first_category_success<-infected_first_category[-c(1:ar_order)] #this will be used in dbinom er x.. binomial e I2 theke I598 obdhi lagbe . So first one deleted
-length(infected_first_category_success)
-
-# t<-1:length(infected_first_category)
-#infected_first_category_minus_last_term<-data$Bath[-nstep]  #prob. (ie pie) ber korar somoi I1,..,,I597 lagbe.. pie1 is functn of I1,.., pie2 is functn of I2 etc.. so last er ta delete kore dewoa holo
-
+infected_first_category_success<-infected_first_category[-c(1:ar_order)] 
 log_infected_first_category<-infected_first_category
 log_infected_first_category[log_infected_first_category == 0] <- 1
 log_infected_first_category<-log(log_infected_first_category)
@@ -48,6 +43,8 @@ infected_first_category_in_inverselogit<- data.frame("lag1"=dplyr::lag(log_infec
 #distance between [leicester,coventry]=52955.13,[Birmingham,coventry]=55266.08 (in meters)
 #distance between [leicester,coventry]=52.95513,[Birmingham,coventry]=55.26608 (in kms)
 #so exp(-52.95513) = 1.004337e-23 ; exp(-55.26608) = 9.959704e-25
+#so (1/52.95513)^2= 0.0003566021  ;  (1/55.26608)^2=0.000327403
+
 
 
 infected_second_category<-data$Birmingham[1:training_upto]
@@ -56,12 +53,12 @@ infected_third_category<-data$Leicester[1:training_upto]
 log_infected_second_category<-infected_second_category
 log_infected_second_category[log_infected_second_category == 0] <- 1
 log_infected_second_category<-log(log_infected_second_category)
-log_infected_second_category<-9.959704e-25*log_infected_second_category    #this is w[i,j]*infected_2nd_category
+log_infected_second_category<-0.000327403*log_infected_second_category    #this is w[i,j]*infected_2nd_category
 
 log_infected_third_category<-infected_third_category
 log_infected_third_category[log_infected_third_category == 0] <- 1
 log_infected_third_category<-log(log_infected_third_category)
-log_infected_third_category<-1.004337e-23*log_infected_third_category       #this is w[i,j]*infected_3rd_category
+log_infected_third_category<-0.0003566021*log_infected_third_category       #this is w[i,j]*infected_3rd_category
 
 infected_first_category_in_inverselogit<- data.frame("lag1"=dplyr::lag(log_infected_first_category, 1),
                                                      
@@ -98,8 +95,8 @@ if (ar_order == 1) {
 length(biweekly_birth_data_in_inverselogit)
 t<- (ar_order+1):training_upto
 length(t)
-seasonality1<-sin(2*pi*t/52)
-seasonality2<-sin(2*pi*t/26)
+seasonality1<-cos(2*pi*t/52)
+seasonality2<-cos(2*pi*t/26)
 length(seasonality1)
 
 baby_boom_effect1<- c(rep(0,104),rep(1,182-104),rep(0,nstep-182))
@@ -132,11 +129,6 @@ length(infected_first_category_in_inverselogit$lag1_3rd)
 
 nrow(data_sf)
 
-data<-matrix(c(rep(1,length(infected_first_category_in_inverselogit$lag1)),
-               infected_first_category_in_inverselogit$lag1+infected_first_category_in_inverselogit$lag1_2nd+infected_first_category_in_inverselogit$lag1_3rd,
-               biweekly_birth_data_in_inverselogit,seasonality2,t,baby_boom_effect
-),
-nrow = length(infected_first_category_in_inverselogit$lag1))
 
 data<- data.frame(infected_first_category_in_inverselogit$lag1+infected_first_category_in_inverselogit$lag1_2nd+infected_first_category_in_inverselogit$lag1_3rd,
                   biweekly_birth_data_in_inverselogit,seasonality2,t,baby_boom_effect)
@@ -148,16 +140,8 @@ head(data,20)
 model <- glm(cbind(S,F) ~ Lag1_and_Lag1_2nd_and_LAg1_3rd+biweeklybirth+Seasonalit2+time+baby_boom, 
              family = binomial(link = "logit"), data = data)
 
-# 
-# 
-# 
-# 
-# colnames(data) <- c("Intercept", "Lag1+Lag1_2nd+LAg1_3rd","biweeklybirth","Seasonalit2","time","baby_boom")
-# head(data,20)
-# 
-# 
-# glarmamod1 <- glarma(data_sf, data,type = "Bin",method = "NR",
-#                      residuals = "Identity", maxit = 100, grad = 1e-6)
+
+
 
 acf(model$residuals   ,xlab="Lag",main="Acf plot for errors",ci=0.50)
 pacf(model$residuals,   xlab="Lag",main="PAcf plot for errors",ci=0.50)
@@ -174,3 +158,8 @@ legend("topright",legend = c("Real","Estimated"),col=c("black","red"),lty =c(1,1
 
 Box_ljung_test<- Box.test(model$residuals,lag=500,type = "Ljung-Box")
 Box_ljung_test
+
+summary(model)
+
+mse<-sqrt(  (1/length(infected_first_category_success))*(sum((infected_first_category_success-predicted)^2))   )
+mse

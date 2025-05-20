@@ -32,12 +32,7 @@ length(cum)
 
 
 ar_order<-1
-infected_first_category_success<-infected_first_category[-c(1:ar_order)] #this will be used in dbinom er x.. binomial e I2 theke I598 obdhi lagbe . So first one deleted
-length(infected_first_category_success)
-
-# t<-1:length(infected_first_category)
-#infected_first_category_minus_last_term<-data$Bath[-nstep]  #prob. (ie pie) ber korar somoi I1,..,,I597 lagbe.. pie1 is functn of I1,.., pie2 is functn of I2 etc.. so last er ta delete kore dewoa holo
-
+infected_first_category_success<-infected_first_category[-c(1:ar_order)]
 log_infected_first_category<-infected_first_category
 log_infected_first_category[log_infected_first_category == 0] <- 1
 log_infected_first_category<-log(log_infected_first_category)
@@ -150,16 +145,6 @@ head(data,20)
 model <- glm(cbind(S,F) ~ Lag1_and_Lag1_2nd_and_LAg1_3rd+biweeklybirth+Seasonalit2+time+baby_boom, 
              family = binomial(link = "logit"), data = data)
 
-# 
-# 
-# 
-# 
-# colnames(data) <- c("Intercept", "Lag1+Lag1_2nd+LAg1_3rd","biweeklybirth","Seasonalit2","time","baby_boom")
-# head(data,20)
-# 
-# 
-# glarmamod1 <- glarma(data_sf, data,type = "Bin",method = "NR",
-#                      residuals = "Identity", maxit = 100, grad = 1e-6)
 
 acf(model$residuals   ,xlab="Lag",main="Acf plot for errors",ci=0.50)
 pacf(model$residuals,   xlab="Lag",main="PAcf plot for errors",ci=0.50)
