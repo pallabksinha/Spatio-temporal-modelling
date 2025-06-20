@@ -139,10 +139,9 @@ for(training_upto in forecasting_loop_starts_from:forecasting_loop_ends_in){
   stored[[training_upto-(forecasting_loop_starts_from-1)]]<-unlist(probabilities)[!is.na(unlist(probabilities))][which.max(predicted_probabilities_unlist[[training_upto-(forecasting_loop_starts_from-1)]])]
   
   max_position<- which.max(predicted_probabilities_unlist[[training_upto-(forecasting_loop_starts_from-1)]])
-  # i <- (max_position - 1) %/% length(glarmamod[[1]]) + 1  # List index
-  # j <- (max_position - 1) %% length(glarmamod[[1]]) + 1    # Sub-index within each list element
+  
   glarmamod1<-glarmamod[[max_position]]    
-  # So there are M possible candidate values for the point we are trying to forecast.. among them we are choosing the one which produces the highest probability
+  # So there are M possible candidate values for the time point we are trying to forecast.. among them we are choosing the one which produces the highest probability
   # consequently in HDR also, we will use this set of estimated parameters 
   
   HDR_interval_pts[[training_upto-(forecasting_loop_starts_from-1)]]<- rbinom(n=no_iterations,size=floor(S1-(sum(data_sf[,1])+median(start_value_of_k:end_value_of_k))),
@@ -372,7 +371,7 @@ for(training_upto in forecasting_loop_starts_from:forecasting_loop_ends_in){
   max_position<- which.max(predicted_probabilities_unlist[[training_upto-(forecasting_loop_starts_from-1)]])
   # i <- (max_position - 1) %/% length(glarmamod[[1]]) + 1  # List index
   # j <- (max_position - 1) %% length(glarmamod[[1]]) + 1    # Sub-index within each list element
-  glarmamod1<-glarmamod[[max_position]]    #so here out of k*l glarmamod objects, one is chosen corresponding to which max prob of \hat{I_{n+2}} has been produced..
+  glarmamod1<-glarmamod[[max_position]]    
   
   
   HDR_interval_pts[[training_upto-(forecasting_loop_starts_from-1)]]<- rbinom(n=no_iterations,size=floor(S1-(sum(data_sf[,1])+median(start_value_of_k:end_value_of_k))),
@@ -605,7 +604,7 @@ for(training_upto in forecasting_loop_starts_from:forecasting_loop_ends_in){
   max_position<- which.max(predicted_probabilities_unlist[[training_upto-(forecasting_loop_starts_from-1)]])
   # i <- (max_position - 1) %/% length(glarmamod[[1]]) + 1  # List index
   # j <- (max_position - 1) %% length(glarmamod[[1]]) + 1    # Sub-index within each list element
-  glarmamod1<-glarmamod[[max_position]]    #so here out of k*l glarmamod objects, one is chosen corresponding to which max prob of \hat{I_{n+2}} has been produced..
+  glarmamod1<-glarmamod[[max_position]]   
   
   
   HDR_interval_pts[[training_upto-(forecasting_loop_starts_from-1)]]<- rbinom(n=no_iterations,size=floor(S1-(sum(data_sf[,1])+median(start_value_of_k:end_value_of_k))),
